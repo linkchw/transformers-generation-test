@@ -1,4 +1,9 @@
-text = "علیرضا"
+import regex as re
+import os , json
+import tiktoken 
+
+
+text = "گُنْجـِشْکْ به پرندگان خانوادهٔ گنجشکان گفته می‌شود، که خود در راستهٔ گنجشک‌سانان می‌گنجند. گنجشک خانگی معروف‌ترین گونهٔ گنجشک است که در تعداد بسیار زیاد در همۀ قاره‌های جهان و بیشتر در مناطق شهری زندگی می‌کند. گنجشک پرنده‌ای است کوچک با نوک کلفت و مخروطی و پاهای نسبتاً کوتاه که اغلب پر و بال رنگارنگ ندارد. گنجشک‌ها بیشتر به‌صورت اجتماعی به سر می‌برند و به‌طور گروهی زادوولد می‌کنند. در بیشتر گونه‌ها دودیسی جنسی (تفاوت نر و ماده) دیده می‌شود. در سوراخ‌های درختان، شکاف دیوار و صخره‌ها لانه می‌سازند. بیشتر از دانه‌ها و مواد گیاهی و گاه جانوری تغذیه می‌کنند. معمولاً گنجشک‌هایی که در شهرها زندگی می‌کنند از نوع گنجشک خانگی و گنجشک درختی هستند."
 tokens = text.encode("utf-8") # raw bytes
 tokens = list(map(int, tokens)) # convert to a list of integers in range 0..255 for convenience
 print('---')
@@ -79,11 +84,27 @@ print(decode([128]))
 def encode(text):
     # given a string, return list of integers (the tokens)
     tokens = list(text.encode("utf-8"))
-    while True:
+    while len(tokens) >= 2:
         stats = get_stats(tokens)
         pair = min(stats, key=lambda p: merges.get(p, float("inf")))
         if pair not in merges:
             break
 
+        idx = merges[pair] 
+        tokens = merge(tokens, pair, idx)
+    return tokens
+
+print(encode("علیرضا"))
+print(decode(encode("علیرضا")))
 
 print(encode("Hello, world!"))
+print(decode(encode("Hello, world!")))
+
+gpt2pat = re.compile(r"""'s|'t|'re|'ve|'m|'ll|'d| ?\p{L}+| ?\p{N}+| ?[^\s\p{L}\p{N}]+|\s+(?!\S)|\s+""")
+print(re.findall(gpt2pat, "Hello, world!"))
+
+
+# enc = tiktoken.get_encoding("gpt2")
+# print(enc.encode("علیرضا"))
+# print(enc.decode(enc.encode("علیرضا")))
+
